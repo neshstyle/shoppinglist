@@ -20,10 +20,15 @@
         this.quantity = quantity;
       }
 
-      // getTotalValue() returns how much this product is worth in stock total
-      // Formula: price multiplied by quantity
+      // getTotalValue() returns total stock value: price x quantity
       getTotalValue() {
         return this.price * this.quantity;
+      }
+
+      // toString() returns a human-readable description of the product
+      // toFixed(2) ensures the price always shows two decimal places
+      toString() {
+        return `Product: ${this.name}, Price: $${this.price.toFixed(2)}, Quantity: ${this.quantity}`;
       }
 
     }
