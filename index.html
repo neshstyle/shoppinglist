@@ -64,12 +64,19 @@
         this.inventory.push(product);
       }
 
-      // getInventoryValue() loops through all products and sums their total values
-      // reduce() starts at 0 and adds each product's getTotalValue() result
       getInventoryValue() {
         return this.inventory.reduce((total, product) => {
-          return total + product.getTotalValue(); // getTotalValue() = price * quantity
-        }, 0); // 0 is the starting value of total
+          return total + product.getTotalValue();
+        }, 0);
+      }
+
+      // findProductByName() searches the inventory for a matching name
+      // toLowerCase() on both sides makes the search case-insensitive
+      // Returns the product object if found, or null if nothing matches
+      findProductByName(name) {
+        return this.inventory.find(
+          product => product.name.toLowerCase() === name.toLowerCase()
+        ) || null;
       }
     }
     }
