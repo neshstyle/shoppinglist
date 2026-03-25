@@ -24,16 +24,18 @@
       }
     }
 
-    // Subclass for perishable products — inherits from ProductProperties
     class PerishableProductProperties extends ProductProperties {
-
-      // constructor calls super() to run the parent constructor first,
-      // then adds the expirationDate property unique to perishable items
       constructor(name, price, quantity, expirationDate) {
-        super(name, price, quantity); // pass shared properties up to the base class
-        this.expirationDate = expirationDate; // new property only perishables have
+        super(name, price, quantity);
+        this.expirationDate = expirationDate;
       }
 
+      // Override toString() from the base class
+      // This version adds the expiration date to the output string
+      // The base class toString() only shows name, price, quantity
+      toString() {
+        return `Product: ${this.name}, Price: $${this.price.toFixed(2)}, Quantity: ${this.quantity}, Expiration Date: ${this.expirationDate}`;
+      }
     }
   </script>
 
