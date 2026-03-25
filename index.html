@@ -78,6 +78,16 @@
           product => product.name.toLowerCase() === name.toLowerCase()
         ) || null;
       }
+           // --- Regular products (no expiration date) ---
+    // Each takes: name (string), price (number), quantity (number)
+    const apple = new ProductProperties("Apple", 2.50, 100);
+    const bread = new ProductProperties("Bread", 3.99, 40);
+    const pasta = new ProductProperties("Pasta", 1.75, 60);
+
+    // --- Perishable products (have an expiration date) ---
+    // Each takes: name, price, quantity, expirationDate (YYYY-MM-DD string)
+    const milk   = new PerishableProductProperties("Milk",   1.50, 30, "2025-06-15");
+    const yogurt = new PerishableProductProperties("Yogurt", 2.20, 25, "2025-05-30");
     }
     }
   </script>
