@@ -49,5 +49,20 @@
     const yogurt = new PerishableProductProperties("Yogurt", 2.20, 25, "2025-05-30");
   </script>
 
+    <script>
+    class ProductProperties { /* ... same as before ... */ }
+    ProductProperties.applyDiscount = function(products, discount) { /* ... */ };
+    class PerishableProductProperties extends ProductProperties { /* ... same as before ... */ }
+
+    // Store class manages a collection of products
+    // inventory is an array that holds all product objects
+    class Store {
+      constructor() {
+        this.inventory = []; // starts empty, products added via addProduct()
+      }
+      // Methods coming in next commits
+    }
+  </script>
+
 </body>
 </html>
