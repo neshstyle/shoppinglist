@@ -55,16 +55,23 @@
     class PerishableProductProperties extends ProductProperties { /* ... same as before ... */ }
 
     // Store class manages a collection of products
-       class Store {
+      class Store {
       constructor() {
         this.inventory = [];
       }
 
-      // addProduct() accepts any Product or PerishableProduct object
-      // and pushes it into the inventory array
       addProduct(product) {
         this.inventory.push(product);
       }
+
+      // getInventoryValue() loops through all products and sums their total values
+      // reduce() starts at 0 and adds each product's getTotalValue() result
+      getInventoryValue() {
+        return this.inventory.reduce((total, product) => {
+          return total + product.getTotalValue(); // getTotalValue() = price * quantity
+        }, 0); // 0 is the starting value of total
+      }
+    }
     }
   </script>
 
