@@ -13,12 +13,17 @@
     // Base class: holds shared data for every product
     class ProductProperties {
 
-      // constructor() runs automatically when a new product is created
-      // It sets the three required properties for every product
+      // constructor sets name, price, and quantity when a product is created
       constructor(name, price, quantity) {
-        this.name = name;         // product name (string)
-        this.price = price;       // price per unit (number)
-        this.quantity = quantity; // units available in stock (number)
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+      }
+
+      // getTotalValue() returns how much this product is worth in stock total
+      // Formula: price multiplied by quantity
+      getTotalValue() {
+        return this.price * this.quantity;
       }
 
     }
