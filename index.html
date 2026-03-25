@@ -9,11 +9,18 @@
 
   <h1>Store Inventory System</h1>
 
-   <script>
-    // Base class for all products in the store
-    // This will hold shared properties: name, price, quantity
+  <script>
+    // Base class: holds shared data for every product
     class ProductProperties {
-      // Methods will be added in upcoming commits
+
+      // constructor() runs automatically when a new product is created
+      // It sets the three required properties for every product
+      constructor(name, price, quantity) {
+        this.name = name;         // product name (string)
+        this.price = price;       // price per unit (number)
+        this.quantity = quantity; // units available in stock (number)
+      }
+
     }
   </script>
 
