@@ -55,12 +55,16 @@
     class PerishableProductProperties extends ProductProperties { /* ... same as before ... */ }
 
     // Store class manages a collection of products
-    // inventory is an array that holds all product objects
-    class Store {
+       class Store {
       constructor() {
-        this.inventory = []; // starts empty, products added via addProduct()
+        this.inventory = [];
       }
-      // Methods coming in next commits
+
+      // addProduct() accepts any Product or PerishableProduct object
+      // and pushes it into the inventory array
+      addProduct(product) {
+        this.inventory.push(product);
+      }
     }
   </script>
 
