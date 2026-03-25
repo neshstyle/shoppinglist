@@ -4,27 +4,161 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Store Inventory System</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; color: #222; }
-  h1 { text-align: center; margin-bottom: 20px; }
-  .card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
-  .card h2 { margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
-  th { background: #e8e8e8; }
-  .perishable { color: #c0392b; font-size: 0.75rem; font-weight: bold; }
-  .value-box { display: flex; gap: 20px; flex-wrap: wrap; }
-  .value-box div { background: #eef2ff; border: 1px solid #b0b8f0; border-radius: 6px; padding: 12px 20px; min-width: 180px; }
-  .value-box div span { display: block; font-size: 0.8rem; color: #555; }
-  .value-box div strong { font-size: 1.3rem; }
-  .found-box { background: #e9f7ef; border: 1px solid #a9dfbf; border-radius: 6px; padding: 12px 16px; }
-  .not-found { color: #c0392b; }
-  pre { background: #1e1e1e; color: #d4d4d4; padding: 14px; border-radius: 6px; font-size: 0.82rem; overflow-x: auto; }
-</style>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; color: #222; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+    .card h2 { margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
+    th { background: #e8e8e8; }
+    .perishable { color: #c0392b; font-size: 0.75rem; font-weight: bold; }
+    .value-box { display: flex; gap: 20px; flex-wrap: wrap; }
+    .value-box div { background: #eef2ff; border: 1px solid #b0b8f0; border-radius: 6px; padding: 12px 20px; min-width: 180px; }
+    .value-box div span { display: block; font-size: 0.8rem; color: #555; }
+    .value-box div strong { font-size: 1.3rem; }
+    .found-box { background: #e9f7ef; border: 1px solid #a9dfbf; border-radius: 6px; padding: 12px 16px; }
+    .not-found { color: #c0392b; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 14px; border-radius: 6px; font-size: 0.82rem; overflow-x: auto; }
+  </style>
+</head>
+<body>
 
-<!-- Inventory table card -->
+<h1>🛒 Store Inventory System</h1>
+
+<!-- =============================================
+     PART 1: BASE CLASS - ProductProperties
+     Stores name, price, quantity.
+     Provides getTotalValue() and toString().
+============================================= -->
+<script>
+class ProductProperties {
+
+  // constructor sets name, price, quantity when a product is created
+  constructor(name, price, quantity) {
+    this.name = name;         // product name (string)
+    this.price = price;       // price per unit (number)
+    this.quantity = quantity; // units in stock (number)
+  }
+
+  // getTotalValue() returns total stock value: price multiplied by quantity
+  getTotalValue() {
+    return this.price * this.quantity;
+  }
+
+  // toString() returns a readable product description
+  // toFixed(2) keeps price formatted to two decimal places
+  toString() {
+    return `Product: ${this.name}, Price: $${this.price.toFixed(2)}, Quantity: ${this.quantity}`;
+  }
+}
+
+// =============================================
+// Static method: applyDiscount(products, discount)
+// Called on the class itself, not on an instance
+// Loops through the array and reduces each product's price
+// Example: discount of 0.15 = 15% off
+// =============================================
+ProductProperties.applyDiscount = function(products, discount) {
+  products.forEach(product => {
+    // price * (1 - discount) gives the discounted price
+    // parseFloat + toFixed(2) ensures clean 2-decimal result
+    product.price = parseFloat((product.price * (1 - discount)).toFixed(2));
+  });
+};
+
+// =============================================
+// PART 2: SUBCLASS - PerishableProductProperties
+// Inherits from ProductProperties via "extends"
+// Adds expirationDate property
+// Overrides toString() to include that date
+// =============================================
+class PerishableProductProperties extends ProductProperties {
+
+  // constructor calls super() to run the parent constructor,
+  // then sets the additional expirationDate property
+  constructor(name, price, quantity, expirationDate) {
+    super(name, price, quantity); // runs ProductProperties constructor
+    this.expirationDate = expirationDate; // e.g. "2025-06-15"
+  }
+
+  // toString() overrides the base version to also show expiration date
+  toString() {
+    return `Product: ${this.name}, Price: $${this.price.toFixed(2)}, Quantity: ${this.quantity}, Expiration Date: ${this.expirationDate}`;
+  }
+}
+
+// =============================================
+// PART 4: STORE CLASS
+// Manages an inventory array of product objects
+// =============================================
+class Store {
+
+  constructor() {
+    this.inventory = []; // empty array, populated using addProduct()
+  }
+
+  // addProduct() accepts any Product or PerishableProduct and adds it to inventory
+  addProduct(product) {
+    this.inventory.push(product);
+  }
+
+  // getInventoryValue() sums the total value of all products in inventory
+  // reduce() accumulates total starting from 0
+  getInventoryValue() {
+    return this.inventory.reduce((total, product) => {
+      return total + product.getTotalValue();
+    }, 0);
+  }
+
+  // findProductByName() searches inventory for a name match
+  // toLowerCase() on both sides makes the search case-insensitive
+  // Returns the matching product, or null if none found
+  findProductByName(name) {
+    return this.inventory.find(
+      product => product.name.toLowerCase() === name.toLowerCase()
+    ) || null;
+  }
+}
+
+// =============================================
+// PART 5: TESTING THE SYSTEM
+// =============================================
+
+// --- 3 regular products ---
+const apple  = new ProductProperties("Apple", 2.50, 100);
+const bread  = new ProductProperties("Bread", 3.99, 40);
+const pasta  = new ProductProperties("Pasta", 1.75, 60);
+
+// --- 2 perishable products (required minimum) ---
+const milk   = new PerishableProductProperties("Milk",   1.50, 30, "2025-06-15");
+const yogurt = new PerishableProductProperties("Yogurt", 2.20, 25, "2025-05-30");
+
+// --- Build store and add all products ---
+const myStore = new Store();
+myStore.addProduct(apple);
+myStore.addProduct(bread);
+myStore.addProduct(pasta);
+myStore.addProduct(milk);
+myStore.addProduct(yogurt);
+
+// --- Record total value BEFORE discount ---
+const valueBefore = myStore.getInventoryValue();
+
+// --- Apply 15% discount to every product ---
+ProductProperties.applyDiscount(myStore.inventory, 0.15);
+
+// --- Record total value AFTER discount ---
+const valueAfter = myStore.getInventoryValue();
+
+// --- Search for a product by name ---
+const searchTerm = "Milk";
+const foundProduct = myStore.findProductByName(searchTerm);
+</script>
+
+<!-- HTML display cards -->
 <div class="card">
-  <h2>Inventory (after discount)</h2>
+  <h2>📦 Inventory (after discount applied)</h2>
   <table>
     <thead>
       <tr>
@@ -36,159 +170,59 @@
   </table>
 </div>
 
-<!-- Value comparison card -->
 <div class="card">
-  <h2>Inventory Value</h2>
+  <h2>💰 Inventory Value</h2>
   <div class="value-box">
     <div><span>Before 15% Discount</span><strong id="before-val"></strong></div>
     <div><span>After 15% Discount</span><strong id="after-val"></strong></div>
   </div>
 </div>
 
-<!-- Search result card -->
 <div class="card">
-  <h2>Product Search — "<span id="search-label"></span>"</h2>
+  <h2>🔍 Product Search — "<span id="search-label"></span>"</h2>
   <div id="search-result"></div>
 </div>
 
-<!-- toString() output card -->
 <div class="card">
-  <h2>toString() Output</h2>
+  <h2>🖥️ toString() Output</h2>
   <pre id="console-out"></pre>
 </div>
-</head>
-<body>
 
-  <h1>Store Inventory System</h1>
+<!-- DOM render script: populates the HTML cards with live JS data -->
+<script>
+  // Build the inventory table rows dynamically from the store's inventory array
+  const tbody = document.getElementById("inventory-table");
+  myStore.inventory.forEach(p => {
+    const isPerishable = p instanceof PerishableProductProperties;
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${p.name}</td>
+      <td>$${p.price.toFixed(2)}</td>
+      <td>${p.quantity}</td>
+      <td>$${p.getTotalValue().toFixed(2)}</td>
+      <td>${isPerishable ? '<span class="perishable">Perishable</span>' : 'Regular'}</td>
+      <td>${isPerishable ? p.expirationDate : '—'}</td>
+    `;
+    tbody.appendChild(row);
+  });
 
-  <script>
-    class ProductProperties {
-      constructor(name, price, quantity) {
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
-      }
-      getTotalValue() {
-        return this.price * this.quantity;
-      }
-      toString() {
-        return `Product: ${this.name}, Price: $${this.price.toFixed(2)}, Quantity: ${this.quantity}`;
-      }
-    }
+  // Display before and after discount values
+  document.getElementById("before-val").textContent = `$${valueBefore.toFixed(2)}`;
+  document.getElementById("after-val").textContent  = `$${valueAfter.toFixed(2)}`;
 
-    // Static method: called on the class itself, not on individual product instances
-    // Takes an array of products and a discount decimal (e.g. 0.15 = 15%)
-    // Loops through every product and reduces its price by the discount amount
-    ProductProperties.applyDiscount = function(products, discount) {
-      products.forEach(product => {
-        // Multiply price by (1 - discount) to get the reduced price
-        // parseFloat + toFixed(2) ensures clean 2-decimal output
-        product.price = parseFloat((product.price * (1 - discount)).toFixed(2));
-      });
-    };
+  // Display search result using the product's toString() method
+  document.getElementById("search-label").textContent = searchTerm;
+  const resultBox = document.getElementById("search-result");
+  if (foundProduct) {
+    resultBox.innerHTML = `<div class="found-box">${foundProduct.toString()}</div>`;
+  } else {
+    resultBox.innerHTML = `<p class="not-found">No product found: "${searchTerm}"</p>`;
+  }
 
-    class PerishableProductProperties extends ProductProperties {
-      constructor(name, price, quantity, expirationDate) {
-        super(name, price, quantity);
-        this.expirationDate = expirationDate;
-      }
-      toString() {
-        return `Product: ${this.name}, Price: $${this.price.toFixed(2)}, Quantity: ${this.quantity}, Expiration Date: ${this.expirationDate}`;
-      }
-    }
-
-    const milk   = new PerishableProductProperties("Milk",   1.50, 30, "2025-06-15");
-    const yogurt = new PerishableProductProperties("Yogurt", 2.20, 25, "2025-05-30");
-  </script>
-
-    <script>
-    class ProductProperties { /* ... same as before ... */ }
-    ProductProperties.applyDiscount = function(products, discount) { /* ... */ };
-    class PerishableProductProperties extends ProductProperties { /* ... same as before ... */ }
-
-    // Store class manages a collection of products
-      class Store {
-      constructor() {
-        this.inventory = [];
-      }
-
-      addProduct(product) {
-        this.inventory.push(product);
-      }
-
-      getInventoryValue() {
-        return this.inventory.reduce((total, product) => {
-          return total + product.getTotalValue();
-        }, 0);
-      }
-
-      // findProductByName() searches the inventory for a matching name
-      // toLowerCase() on both sides makes the search case-insensitive
-      // Returns the product object if found, or null if nothing matches
-      findProductByName(name) {
-        return this.inventory.find(
-          product => product.name.toLowerCase() === name.toLowerCase()
-        ) || null;
-      }
-           // --- Regular products (no expiration date) ---
-    // Each takes: name (string), price (number), quantity (number)
-    const apple = new ProductProperties("Apple", 2.50, 100);
-    const bread = new ProductProperties("Bread", 3.99, 40);
-    const pasta = new ProductProperties("Pasta", 1.75, 60);
-
-    // --- Perishable products (have an expiration date) ---
-    // Each takes: name, price, quantity, expirationDate (YYYY-MM-DD string)
-    const milk   = new PerishableProductProperties("Milk",   1.50, 30, "2025-06-15");
-    const yogurt = new PerishableProductProperties("Yogurt", 2.20, 25, "2025-05-30");
-    }
-    // --- Regular products (no expiration date) ---
-    // Each takes: name (string), price (number), quantity (number)
-    const apple = new ProductProperties("Apple", 2.50, 100);
-    const bread = new ProductProperties("Bread", 3.99, 40);
-    const pasta = new ProductProperties("Pasta", 1.75, 60);
-
-    // --- Perishable products (have an expiration date) ---
-    // Each takes: name, price, quantity, expirationDate (YYYY-MM-DD string)
-    const milk   = new PerishableProductProperties("Milk",   1.50, 30, "2025-06-15");
-    const yogurt = new PerishableProductProperties("Yogurt", 2.20, 25, "2025-05-30");
-    }
-       // Create a new Store instance — inventory starts as an empty array
-    const myStore = new Store();
-
-    // Add all five products to the store's inventory
-    // addProduct() pushes each object into the inventory array
-    myStore.addProduct(apple);
-    myStore.addProduct(bread);
-    myStore.addProduct(pasta);
-    myStore.addProduct(milk);
-    myStore.addProduct(yogurt);
-      
- // Record total inventory value BEFORE applying any discount
-    const valueBefore = myStore.getInventoryValue();
-    console.log("Inventory value before discount: $" + valueBefore.toFixed(2));
-
-    // Apply a 15% discount to every product in the inventory
-    // 0.15 represents 15% — the static method reduces each product's price
-    ProductProperties.applyDiscount(myStore.inventory, 0.15);
-
-    // Record total inventory value AFTER the discount has been applied
-    const valueAfter = myStore.getInventoryValue();
-    console.log("Inventory value after discount: $" + valueAfter.toFixed(2));
-    // Search for a product by name using the store's findProductByName() method
-    // The search is case-insensitive so "milk" and "Milk" both work
-    const searchTerm = "Milk";
-    const foundProduct = myStore.findProductByName(searchTerm);
-
-    // If a matching product is found, print its details using toString()
-    // If not found, findProductByName returns null — log a fallback message
-    if (foundProduct) {
-      console.log("Found: " + foundProduct.toString());
-    } else {
-      console.log("Product not found: " + searchTerm);
-    }
-      
-      
-  </script>
+  // Print toString() for all products to the on-page console block
+  const lines = myStore.inventory.map(p => p.toString());
+  document.getElementById("console-out").textContent = lines.join("\n");
+</script>
 
 </body>
 </html>
