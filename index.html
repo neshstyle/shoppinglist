@@ -110,6 +110,20 @@
     myStore.addProduct(pasta);
     myStore.addProduct(milk);
     myStore.addProduct(yogurt);
+ // Record total inventory value BEFORE applying any discount
+    const valueBefore = myStore.getInventoryValue();
+    console.log("Inventory value before discount: $" + valueBefore.toFixed(2));
+
+    // Apply a 15% discount to every product in the inventory
+    // 0.15 represents 15% — the static method reduces each product's price
+    ProductProperties.applyDiscount(myStore.inventory, 0.15);
+
+    // Record total inventory value AFTER the discount has been applied
+    const valueAfter = myStore.getInventoryValue();
+    console.log("Inventory value after discount: $" + valueAfter.toFixed(2));
+
+      
+      
   </script>
 
 </body>
